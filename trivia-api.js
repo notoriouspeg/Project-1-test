@@ -5,12 +5,14 @@ let correctAnswers = [];
 let wrongAnswers = [];
 let i = 0;
 
+
 // function to add new users name/score
 function listUsers() {
 $("#playerNames").empty();
     userNames.forEach(user => {
         
         let newPlayer = $("<p>");
+        newPlayer.attr("id", $("#nameSet").val());
         newPlayer.append(`${user.name}'s score: ${user.score}`);
         $("#playerNames").append(newPlayer);
     })
@@ -43,7 +45,6 @@ $(document).ready(function () {
         event.preventDefault();
         let newUser = { name: "", score: 0 }
         let addedName = $("#nameSet").val();
-        $("#nameSet").val("");
         newUser.name = addedName;
         userNames.push(newUser);
         console.log(userNames);
@@ -82,6 +83,16 @@ $(document).ready(function () {
                 currentAnswerArray.push(array[i].incorrect_answers[0]);
                 currentAnswerArray.push(array[i].incorrect_answers[1]);
                 currentAnswerArray.push(array[i].incorrect_answers[2]);
+                shuffle(currentAnswerArray);
+
+                currentAnswerArray.forEach(answers => {
+                    let answerButtons = $("<button>");
+                    answerButtons.addClass("btn btn-primary")
+                    answerButtons.attr("type", "button");
+                    answerButtons.text(answers);
+                    $(".btn-group").append(answerButtons);
+                })
+                
 
                 console.log(answerArray);
                 console.log(correctAnswerArray);
@@ -102,7 +113,7 @@ $(document).ready(function () {
                     $("#nextQuestion").click(function(event){
                     event.preventDefault();
                     $("#questionText").empty();
-                    $("#answerText").empty();
+                    $(".btn-group").empty();
                     i++;
                     currentAnswerArray = []
                     console.log(currentAnswerArray);
@@ -110,12 +121,21 @@ $(document).ready(function () {
                     currentAnswerArray.push(array[i].incorrect_answers[0]);
                     currentAnswerArray.push(array[i].incorrect_answers[1]);
                     currentAnswerArray.push(array[i].incorrect_answers[2]);
+                    shuffle(currentAnswerArray);
                     console.log(currentAnswerArray);
+                    currentAnswerArray.forEach(answers => {
+                        let answerButtons = $("<button>");
+                        answerButtons.addClass("btn btn-primary")
+                        answerButtons.attr("type", "button");
+                        answerButtons.text(answers);
+                        $(".btn-group").append(answerButtons);
+                    })
                     questionDisplay();
                     console.log(i);
 
                     if (i > 5) {
                         i = 0;
+
                     }
 
                     }) // end of click function
