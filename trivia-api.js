@@ -3,6 +3,7 @@ let userNames = [];
 let possibleAnswers = [];
 let correctAnswers = [];
 let wrongAnswers = [];
+let i = 0;
 
 // function to add new users name/score
 function listUsers() {
@@ -13,6 +14,26 @@ $("#playerNames").empty();
         newPlayer.append(`${user.name}'s score: ${user.score}`);
         $("#playerNames").append(newPlayer);
     })
+}
+
+// shuffle function
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
 }
 
 $(document).ready(function () {
@@ -27,7 +48,6 @@ $(document).ready(function () {
         userNames.push(newUser);
         console.log(userNames);
         listUsers();
-
     })
 
     // function to get 5 trivia questions based on difficulty
@@ -40,37 +60,68 @@ $(document).ready(function () {
         $.ajax({
             url: queryURL,
             method: "GET",
-        })
-            .then(function (response) {
+        }).then(function (response) {
                 console.log(response)
+                let array = response.results;
+                let answerArray = [];
+                let correctAnswerArray = [];
+                let chosenAnswerArray = [];
+                let currentAnswerArray = [];
 
-                let results = response.results;
-                for (var i = 0; i < results.length; i++) {
+                // pushes the answers into different arrays (answerArray for all avaliable answers, correct/incorrect answer arrays to compare
+                // if the chosen answer is right or wrong)
+                array.forEach(answer => {
+                    answerArray.push(answer.correct_answer);
+                    correctAnswerArray.push(answer.correct_answer);
+                    answer.incorrect_answers.forEach(incorrect => {
+                        answerArray.push(incorrect);
+                    })
+                })
 
-                    let question = results[i].question;
-                    let questionP = $("<p>");
-                    questionP.attr("id", "question");
-                    questionP.text(question);
-                    $("#questionText").append(questionP);
+                currentAnswerArray.push(array[i].correct_answer);
+                currentAnswerArray.push(array[i].incorrect_answers[0]);
+                currentAnswerArray.push(array[i].incorrect_answers[1]);
+                currentAnswerArray.push(array[i].incorrect_answers[2]);
 
-                    let correctAnswer = results[i].correct_answer;
-                    let correctP = $("<p>");
-                    correctP.text("A. " + correctAnswer);
-                    correctP.attr("id", "correct");
-                    $("#answerText").append(correctP);
+                console.log(answerArray);
+                console.log(correctAnswerArray);
+                console.log(currentAnswerArray);
 
-                    let wrongAnswer = results[i].incorrect_answers;
-                    let wrongP = $("<p>");
-                    wrongP.text("B. " + results[i].incorrect_answers[0] + " " + "C. " + results[i].incorrect_answers[1] + " " + "D. " + results[i].incorrect_answers[2]);
-                    wrongP.attr("id", "wrong");
-                    $("#answerText").append(wrongP);
+                
+                questionDisplay();
+                
+                
+                
+                function questionDisplay() {
+
+                    $("#questionText").text(array[i].question);
+                    $("#answerText").text(currentAnswerArray);
+
+                }
 
                     $("#nextQuestion").click(function(event){
                     event.preventDefault();
+                    $("#questionText").empty();
+                    $("#answerText").empty();
+                    i++;
+                    currentAnswerArray = []
+                    console.log(currentAnswerArray);
+                    currentAnswerArray.push(array[i].correct_answer);
+                    currentAnswerArray.push(array[i].incorrect_answers[0]);
+                    currentAnswerArray.push(array[i].incorrect_answers[1]);
+                    currentAnswerArray.push(array[i].incorrect_answers[2]);
+                    console.log(currentAnswerArray);
+                    questionDisplay();
+                    console.log(i);
+
+                    if (i > 5) {
+                        i = 0;
+                    }
 
                     }) // end of click function
-                } // end of for loop
+                // }) // end of for loop
             }) // end of then function
+            
     }) // end of ajax
 
 });
